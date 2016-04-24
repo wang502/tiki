@@ -69,7 +69,7 @@ void lexer_next(sqlstate *sql_state){
   //cout<<"peek: "<<c<<endl;
   if (is_all(c)) SKIP; cout<<"skip once\n";
 }
-
+ 
 void lexer(char *sql){
   struct sqlstate sql_state;
   sql_state.buffer = sql;

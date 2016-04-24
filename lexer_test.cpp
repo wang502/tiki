@@ -5,6 +5,13 @@
 #define PEEK (sql_state->buffer[sql_state->offset])
 #define SKIP (sql_state->offset++)
 
+typedef enum{
+  TOK_NULL, TOK_DELETE, TOK_ORDER, TOK_BY,
+  TOK_FROM, TOK_SELECT, TOK_HAVING, TOK_TRUNCATE,
+  TOK_INSERT, TOK_UNION, TOK_UPDATE, TOK_JOIN, TOK_WHERE,
+  TOK_MERGE
+} sql_token;
+
 using namespace std;
 
 struct sqlstate{
@@ -28,7 +35,7 @@ bool is_all(char c){
 }
 
 bool is_puntuation(char c){
-  return c == '.' || c == ',' || c == ';' || c == '()' || c == ')';
+  return c == '.' || c == ',' || c == ';' || c == '(' || c == ')';
 }
 
 bool is_equal(char c){
@@ -69,7 +76,7 @@ void lexer_next(sqlstate *sql_state){
   //cout<<"peek: "<<c<<endl;
   if (is_all(c)) SKIP; cout<<"skip once\n";
 }
- 
+
 void lexer(char *sql){
   struct sqlstate sql_state;
   sql_state.buffer = sql;

@@ -27,12 +27,32 @@ bool is_all(char c){
   return c == '*';
 }
 
+bool is_puntuation(char c){
+  return c == '.' || c == ',' || c == ';' || c == '()' || c == ')';
+}
+
+bool is_equal(char c){
+  return c == '=';
+}
+
+void slice_buffer(char *buffer, int offset, int length){
+  char sliced[length];
+  int i=0;
+  while (i<length){
+    sliced[i] = buffer[i + offset];
+    i++;
+  }
+  sliced[i] = '\0';
+  cout<<sliced<<endl;
+}
+
 void lexer_alpha(sqlstate *sql_state){
   int offset = sql_state->offset;
   while (is_identifier(PEEK)){
     sql_state->offset++;
   }
   int length = sql_state->offset - offset;
+  slice_buffer(sql_state->buffer, offset, length);
   cout<<length<<endl;
 }
 
@@ -60,6 +80,6 @@ void lexer(char *sql){
 }
 
 int main(){
-  char sql[] = "select * from users";
+  char sql[] = "select * from users where ";
   lexer(sql);
 }

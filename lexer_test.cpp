@@ -86,13 +86,19 @@ void lexer_next(sqlstate *sql_state){
 
 // lexer analysis for select statement
 void lexer_select_next(sqlstate *sql_state, sqlselect *sql){
+loop:
   char c = PEEK;
+  if (is_space(c)){
+    SKIP;
+     goto loop;
+   }
   if (is_alpha(c)){
     lexer_alpha(sql_state, sql);
+    goto loop;
   }
-  c = PEEK;
-  if (is_space(c)) SKIP;
-  if (is_all(c)) SKIP; cout<<"skip once\n";
+  //c = PEEK;
+  //if (is_space(c)) SKIP;
+  if (is_all(c)){SKIP; cout<<"skip once\n"; goto loop;}
 }
 
 void lexer_select(char *buffer){
@@ -101,9 +107,9 @@ void lexer_select(char *buffer){
   sqlselect sql;
   sql_state.buffer = buffer;
   sql_state.offset = 0;
-  while (sql_state.offset <= strlen(sql_state.buffer)-1){
+  //while (sql_state.offset <= strlen(sql_state.buffer)-1){
     lexer_select_next(&sql_state, &sql);
-  }
+  //}
   //delete(sql);
 }
 

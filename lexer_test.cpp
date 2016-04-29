@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include "sqlselect.h"
 
 #define PEEK (sql_state->buffer[sql_state->offset])
@@ -10,7 +11,7 @@ typedef enum{
   TOK_NULL, TOK_DELETE, TOK_ORDER, TOK_BY,
   TOK_FROM, TOK_SELECT, TOK_HAVING, TOK_TRUNCATE,
   TOK_INSERT, TOK_UNION, TOK_UPDATE, TOK_JOIN, TOK_WHERE,
-  TOK_MERGE
+  TOK_MERGE, TOK_DEFAULT
 } sql_token;
 
 using namespace std;
@@ -19,6 +20,46 @@ struct sqlstate{
   char *buffer;
   int offset;
 };
+
+sql_token sql_keyword(char *str, int length){
+  switch (length) {
+    case 2:
+      if (!strcasecmp(str, "by"))
+        return TOK_BY;
+      break;
+    case 4:
+      if (!strcasecmp(str, "null"))
+        return TOK_NULL;
+      if (!strcasecmp(str, "from"))
+        return TOK_FROM;
+      if (!strcasecmp(str, "join"))
+        return TOK_JOIN;
+      break;
+    case 5:
+      if (!strcasecmp(str, "order"))
+        return TOK_ORDER;
+      if (!strcasecmp(str, "union"))
+        return TOK_UNION;
+      if (!strcasecmp(str, "where"))
+        return TOK_WHERE;
+      if (!strcasecmp(str, "merge"))
+        return TOK_MERGE;
+      break;
+    case 6:
+      if (!strcasecmp(str, "select"))
+        return TOK_SELECT;
+      if (!strcasecmp(str, "delete"))
+        return TOK_DELETE;
+      if (!strcasecmp(str, "insert"))
+        return TOK_INSERT;
+      if (!strcasecmp(str, "update"))
+        return TOK_UPDATE;
+      if (!strcasecmp(str, "having"))
+        return TOK_HAVING;
+      break;
+  }
+  return TOK_DEFAULT;
+}
 
 bool is_identifier(char c){
   return isalpha(c) || isdigit(c) || c == '_';
@@ -113,5 +154,7 @@ void lexer_select(char *buffer){
 
 int main(){
   char sql[] = "select * from users where ";
-  lexer_select(sql);
+  //lexer_select(sql);
+  char keyword[] = "null";
+  cout<<sql_keyword(keyword, 4)<<endl;
 }

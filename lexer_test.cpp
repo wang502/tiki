@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cctype>
+#include "sqlselect.h"
 
 #define PEEK (sql_state->buffer[sql_state->offset])
 #define SKIP (sql_state->offset++)
@@ -53,7 +54,18 @@ void slice_buffer(char *buffer, int offset, int length){
   cout<<sliced<<endl;
 }
 
+
 void lexer_alpha(sqlstate *sql_state){
+  int offset = sql_state->offset;
+  while (is_identifier(PEEK)){
+    sql_state->offset++;
+  }
+  int length = sql_state->offset - offset;
+  slice_buffer(sql_state->buffer, offset, length);
+  cout<<length<<endl;
+}
+
+void lexer_alpha(sqlstate *sql_state, sqlselect *sql){
   int offset = sql_state->offset;
   while (is_identifier(PEEK)){
     sql_state->offset++;
@@ -77,16 +89,29 @@ void lexer_next(sqlstate *sql_state){
   if (is_all(c)) SKIP; cout<<"skip once\n";
 }
 
-void lexer(char *sql){
+// lexer analysis for select statement
+void lexer_select_next(sqlstate *sql_state, sqlselect *sql){
+  char c = PEEK;
+  if (is_alpha(c)){
+    lexer_alpha(sql_state, sql);
+  }
+  c = PEEK;
+  if (is_space(c)) SKIP;
+}
+
+void lexer_select(char *buffer){
   struct sqlstate sql_state;
-  sql_state.buffer = sql;
+  //sqlselect *sql = new sqlselect();
+  sqlselect sql;
+  sql_state.buffer = buffer;
   sql_state.offset = 0;
   while (sql_state.offset <= strlen(sql_state.buffer)-1){
-    lexer_next(&sql_state);
+    lexer_select_next(&sql_state, &sql);
   }
+  //delete(sql);
 }
 
 int main(){
   char sql[] = "select * from users where ";
-  lexer(sql);
+  lexer_select(sql);
 }

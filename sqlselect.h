@@ -13,7 +13,7 @@ class sqlselect{
 
   vector<sqlwhere> wheres;
 
-  sqltable from;
+  string from;
 
   bool to_sort;
 

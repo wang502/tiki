@@ -5,8 +5,10 @@ typedef enum{
   TOK_NULL, TOK_DELETE, TOK_ORDER, TOK_BY,
   TOK_FROM, TOK_SELECT, TOK_HAVING, TOK_TRUNCATE,
   TOK_INSERT, TOK_UNION, TOK_UPDATE, TOK_JOIN, TOK_WHERE,
-  TOK_MERGE, TOK_DEFAULT
+  TOK_MERGE, TOK_IDENTIFIER, TOK_ERROR
 } sql_token;
+
+
 
 sql_token sql_keyword(char *str, int length){
   switch (length) {
@@ -45,6 +47,6 @@ sql_token sql_keyword(char *str, int length){
         return TOK_HAVING;
       break;
   }
-  return TOK_DEFAULT;
+  return TOK_IDENTIFIER;
 }
 #endif

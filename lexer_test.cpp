@@ -36,8 +36,12 @@ bool is_all(char c){
   return c == '*';
 }
 
+bool is_dot(char c){
+  return c == '.';
+}
+
 bool is_puntuation(char c){
-  return c == '.' || c == ',' || c == ';' || c == '(' || c == ')';
+  return c == ',' || c == ';' || c == '(' || c == ')';
 }
 
 bool is_equal(char c){
@@ -66,6 +70,7 @@ void lexer_alpha(sqlstate *sql_state){
   cout<<length<<endl;
 }
 
+// lexer alphabetical string for select statement
 sql_token lexer_alpha(sqlstate *sql_state, sqlselect *sql){
   int offset = sql_state->offset;
   while (is_identifier(PEEK)){
@@ -114,28 +119,37 @@ loop:
   return TOK_ERROR;
 }
 
-//sql_token lexer_select_target(&sql_state, &sql){
+sql_token lexer_select_target(sql_state *state, sql *sql){
+  loop:
+    char c =PEEK;
+    if (is_space(c)){
+      SKIP;
+      goto loop;
+    }
+    if (is_dot(c)){
+      SKIP;
+      lexer_alpha(state, sql);
+      /* put the target column name into sql */
+      
+    }
+}
 
-//}
-
-sql_token lexer_select(char *buffer){
+sql_token lexer_select(char *buffer, sqlselect *sql){
   struct sqlstate sql_state;
-  //sqlselect *sql = new sqlselect();
-  sqlselect sql;
   sql_state.buffer = buffer;
   sql_state.offset = 0;
   //while (sql_state.offset <= strlen(sql_state.buffer)-1){
   sql_token t = lexer_select_next(&sql_state, &sql);
   if (t != TOK_SELECT) return TOK_ERROR;
-  return t;
-  //t = lexer_select_targets(&sql_state, &sql);
-  //}
+  //return t;
+  t = lexer_select_targets(&sql_state, &sql);
   //delete(sql);
 }
 
 int main(){
-  char sql[] = "select username from users where user.email = 'setheang@gmail.com'";
-  cout<<lexer_select(sql)<<endl;
+  char buffer[] = "select username from users where user.email = 'setheang@gmail.com'";
+  sqlselect sql;
+  cout<<lexer_select(buffer, &sql)<<endl;
   //char keyword[] = "null";
   //cout<<sql_keyword(keyword, 4)<<endl;
 }

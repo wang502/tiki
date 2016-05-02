@@ -4,22 +4,12 @@
 #include <cstring>
 #include "sqlselect.h"
 #include "keyword.h"
+#include "utils.h"
 
 #define PEEK (sql_state->buffer[sql_state->offset])
 #define SKIP (sql_state->offset++)
 
 using namespace std;
-
-struct sqlidentifier{
-  char *buffer;
-  int length;
-};
-
-struct sqlstate{
-  char *buffer;
-  int offset;
-  sqlidentifier *identifier;
-};
 
 bool is_identifier(char c){
   return isalpha(c) || isdigit(c) || c == '_';
@@ -78,12 +68,11 @@ sql_token lexer_alpha(sqlstate *sql_state, sqlselect *sql){
   }
   int length = sql_state->offset - offset;
   sql_token t = slice_buffer(sql_state->buffer, offset, length);
-  cout<<length<<endl;
+
   if (t != TOK_IDENTIFIER) return t;
-  sqlidentifier *i;
-  i->buffer = sql_state->buffer;
-  i->length = length;
-  sql_state->identifier = i;
+  //sqlidentifier i(offset, length);
+  sql_state->identifier.offset = offset;
+  sql_state->identifier.length = length;
   return TOK_IDENTIFIER;
 }
 
@@ -119,30 +108,59 @@ loop:
   return TOK_ERROR;
 }
 
-sql_token lexer_select_target(sql_state *state, sql *sql){
+// lexer the selected target columns
+//   "user.name, user.email"
+// or  "name, email"
+sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
   loop:
     char c =PEEK;
     if (is_space(c)){
       SKIP;
       goto loop;
     }
-    if (is_dot(c)){
-      SKIP;
-      lexer_alpha(state, sql);
+    if (is_alpha(c)){
+      sql_token t = lexer_alpha(sql_state, sql);
       /* put the target column name into sql */
-      
+      if (t != TOK_IDENTIFIER) return TOK_ERROR;
+      if (t == TOK_FROM) return t;
+      c = PEEK;
+      if (is_dot(c)){
+        SKIP;
+        string table_name = extract(sql_state);
+        sql->set_table(table_name);
+        cout<<"table name: "<<table_name<<endl;
+        goto loop;
+      }
+      else {
+         cout<<"offset: "<<sql_state->identifier.offset<<endl;
+         cout<<"length:"<<sql_state->identifier.length<<endl;
+        string target = extract(sql_state);
+        sqlcolumn col(target);
+        sql->add_column(col);
+        cout<<"column name: "<<target<<endl;
+        goto loop;
+      }
     }
+    if (is_puntuation(c)){
+      SKIP;
+      goto loop;
+    }
+    return TOK_ERROR;
 }
 
 sql_token lexer_select(char *buffer, sqlselect *sql){
-  struct sqlstate sql_state;
-  sql_state.buffer = buffer;
-  sql_state.offset = 0;
+  struct sqlidentifier i(0, 0);
+  struct sqlstate sql_state(buffer, 0, i);
+  //sql_state.buffer = buffer;
+  //sql_state.offset = 0;
+  //sql_state.identifier = i;
   //while (sql_state.offset <= strlen(sql_state.buffer)-1){
-  sql_token t = lexer_select_next(&sql_state, &sql);
+  sql_token t = lexer_select_next(&sql_state, sql);
   if (t != TOK_SELECT) return TOK_ERROR;
   //return t;
-  t = lexer_select_targets(&sql_state, &sql);
+  t = lexer_select_columns(&sql_state, sql);
+  if (t != TOK_FROM || t == TOK_ERROR) return TOK_ERROR;
+  return t;
   //delete(sql);
 }
 

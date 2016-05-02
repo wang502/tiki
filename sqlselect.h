@@ -9,11 +9,11 @@ using namespace std;
 class sqlselect{
   bool select_all;
 
-  vector<sqlcolumn> targets;
+  vector<sqlcolumn> columns;
 
   vector<sqlwhere> wheres;
 
-  string from;
+  string table;
 
   bool to_sort;
 
@@ -22,9 +22,11 @@ class sqlselect{
 public:
   sqlselect();
 
-  void add_target(sqlcolumn target);
+  void add_column(sqlcolumn target);
 
   void add_where(sqlcolumn column, sqlstring value);
+
+  void set_table(string t);
 
 };
 #endif

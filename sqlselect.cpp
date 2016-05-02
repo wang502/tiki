@@ -26,3 +26,7 @@ void sqlselect::print_columns(){
   }
   cout<<endl;
 }
+
+void sqlselect::print_table(){
+  cout<<"table: "<<this->table<<endl;
+}

@@ -2,53 +2,16 @@
 #include <algorithm>
 #include <cctype>
 #include <cstring>
+#include <cassert>
 #include "sqlselect.h"
 #include "keyword.h"
-//#include "utils.h"
+#include "utils.h"
+
 
 #define PEEK (sql_state->buffer[sql_state->offset])
 #define SKIP (sql_state->offset++)
 
 using namespace std;
-
-// extract slice of string given the buffer, offset position and length
-void extract(sqlstate *state, char *copy){
-  int i;
-  int offset = state->identifier.offset;
-  int length = state->identifier.length;
-
-  for (i=0; i<length; i++){
-    *(copy+i) = *(state->buffer+offset+i);
-  }
-  *(copy+i) = '\0';
-}
-
-bool is_identifier(char c){
-  return isalpha(c) || isdigit(c) || c == '_';
-}
-
-bool is_alpha(char c){
-  return isalpha(c);
-}
-
-bool is_space(char c){
-  return c == ' ' || c == '\t' || c == '\v' || c == '\f';
-}
-bool is_all(char c){
-  return c == '*';
-}
-
-bool is_dot(char c){
-  return c == '.';
-}
-
-bool is_puntuation(char c){
-  return c == ',' || c == ';' || c == '(' || c == ')';
-}
-
-bool is_equal(char c){
-  return c == '=';
-}
 
 sql_token slice_buffer(char *buffer, int offset, int length){
   char sliced[length];
@@ -176,9 +139,11 @@ sql_token lexer_select(char *buffer, sqlselect *sql){
 }
 
 int main(){
-  char buffer[] = "select <users.username, users.name from users where users.email = 'setheang@gmail.com'";
+  char buffer[] = "select users.username, users.name from users where users.email = 'setheang@gmail.com'";
   sqlselect sql;
-  cout<<lexer_select(buffer, &sql)<<endl;
-  cout<<sql.get_table()<<endl;
+  sql_token t = lexer_select(buffer, &sql);
+  assert(t==TOK_FROM);
+  std::cout << "Execution continues past the first assert\n";
+  sql.print_table();
   sql.print_columns();
 }

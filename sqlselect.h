@@ -32,5 +32,7 @@ public:
 
   void print_columns();
 
+  void print_table();
+
 };
 #endif

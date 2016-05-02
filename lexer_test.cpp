@@ -4,12 +4,26 @@
 #include <cstring>
 #include "sqlselect.h"
 #include "keyword.h"
-#include "utils.h"
+//#include "utils.h"
 
 #define PEEK (sql_state->buffer[sql_state->offset])
 #define SKIP (sql_state->offset++)
 
 using namespace std;
+
+void extract(sqlstate *state, char *copy){
+  int i;
+  cout<<"o: "<<state->buffer<<endl;
+  int offset = state->identifier.offset;
+  int length = state->identifier.length;
+  cout<<"o: "<<state->identifier.offset<<endl;
+  for (i=0; i<length; i++){
+    cout<<*(state->buffer+offset+i)<<endl;
+    *(copy+i) = *(state->buffer+offset+i);
+  }
+  *(copy+i) = '\0';
+  cout<<"string: "<<copy<<endl;
+}
 
 bool is_identifier(char c){
   return isalpha(c) || isdigit(c) || c == '_';
@@ -126,18 +140,20 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
       c = PEEK;
       if (is_dot(c)){
         SKIP;
-        string table_name = extract(sql_state);
+        char name[10];
+        extract(sql_state, name);
+        string table_name(name);
         sql->set_table(table_name);
         cout<<"table name: "<<table_name<<endl;
         goto loop;
       }
       else {
-         cout<<"offset: "<<sql_state->identifier.offset<<endl;
-         cout<<"length:"<<sql_state->identifier.length<<endl;
-        string target = extract(sql_state);
-        sqlcolumn col(target);
+        char name[10];
+        extract(sql_state, name);
+        string n(name);
+        sqlcolumn col(n);
+        cout<<"column name: "<<col.name<<endl;
         sql->add_column(col);
-        cout<<"column name: "<<target<<endl;
         goto loop;
       }
     }

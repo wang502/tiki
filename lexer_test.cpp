@@ -7,7 +7,6 @@
 #include "keyword.h"
 #include "utils.h"
 
-
 #define PEEK (sql_state->buffer[sql_state->offset])
 #define SKIP (sql_state->offset++)
 
@@ -43,7 +42,6 @@ sql_token lexer_alpha(sqlstate *sql_state, sqlselect *sql){
   sql_token t = slice_buffer(sql_state->buffer, offset, length);
 
   if (t != TOK_IDENTIFIER) return t;
-  //sqlidentifier i(offset, length);
   sql_state->identifier.offset = offset;
   sql_state->identifier.length = length;
   return TOK_IDENTIFIER;
@@ -75,8 +73,6 @@ loop:
   if (is_alpha(c)){
     return lexer_alpha(sql_state, sql);
   }
-  //c = PEEK;
-  //if (is_space(c)) SKIP;
   if (is_all(c)){SKIP; goto loop;}
   return TOK_ERROR;
 }
@@ -84,6 +80,7 @@ loop:
 // lexer the selected target columns
 //   "user.name, user.email"
 // or  "name, email"
+/* lexer of aggregate function needed */
 sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
   loop:
     char c =PEEK;
@@ -119,23 +116,22 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
       SKIP;
       goto loop;
     }
+
     return TOK_ERROR;
 }
 
 sql_token lexer_select(char *buffer, sqlselect *sql){
   struct sqlidentifier i(0, 0);
   struct sqlstate sql_state(buffer, 0, i);
-  //sql_state.buffer = buffer;
-  //sql_state.offset = 0;
-  //sql_state.identifier = i;
-  //while (sql_state.offset <= strlen(sql_state.buffer)-1){
   sql_token t = lexer_select_next(&sql_state, sql);
   if (t != TOK_SELECT) return TOK_ERROR;
   //return t;
   t = lexer_select_columns(&sql_state, sql);
   if (t != TOK_FROM || t == TOK_ERROR) return TOK_ERROR;
+
+  /* lexer form clause */
+
   return t;
-  //delete(sql);
 }
 
 int main(){

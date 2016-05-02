@@ -28,5 +28,9 @@ public:
 
   void set_table(string t);
 
+  string get_table();
+
+  void print_columns();
+
 };
 #endif

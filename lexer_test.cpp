@@ -11,18 +11,16 @@
 
 using namespace std;
 
+// extract slice of string given the buffer, offset position and length
 void extract(sqlstate *state, char *copy){
   int i;
-  cout<<"o: "<<state->buffer<<endl;
   int offset = state->identifier.offset;
   int length = state->identifier.length;
-  cout<<"o: "<<state->identifier.offset<<endl;
+
   for (i=0; i<length; i++){
-    cout<<*(state->buffer+offset+i)<<endl;
     *(copy+i) = *(state->buffer+offset+i);
   }
   *(copy+i) = '\0';
-  cout<<"string: "<<copy<<endl;
 }
 
 bool is_identifier(char c){
@@ -60,7 +58,6 @@ sql_token slice_buffer(char *buffer, int offset, int length){
     i++;
   }
   sliced[i] = '\0';
-  cout<<sliced<<endl;
   return sql_keyword(sliced, length);
 }
 
@@ -71,7 +68,6 @@ void lexer_alpha(sqlstate *sql_state){
     sql_state->offset++;
   }
   int length = sql_state->offset - offset;
-  cout<<length<<endl;
 }
 
 // lexer alphabetical string for select statement
@@ -118,7 +114,7 @@ loop:
   }
   //c = PEEK;
   //if (is_space(c)) SKIP;
-  if (is_all(c)){SKIP; cout<<"skip once\n"; goto loop;}
+  if (is_all(c)){SKIP; goto loop;}
   return TOK_ERROR;
 }
 
@@ -135,7 +131,6 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
     if (is_alpha(c)){
       sql_token t = lexer_alpha(sql_state, sql);
       /* put the target column name into sql */
-      if (t != TOK_IDENTIFIER) return TOK_ERROR;
       if (t == TOK_FROM) return t;
       c = PEEK;
       if (is_dot(c)){
@@ -144,7 +139,7 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
         extract(sql_state, name);
         string table_name(name);
         sql->set_table(table_name);
-        cout<<"table name: "<<table_name<<endl;
+        //cout<<"table name: "<<table_name<<endl;
         goto loop;
       }
       else {
@@ -152,7 +147,7 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
         extract(sql_state, name);
         string n(name);
         sqlcolumn col(n);
-        cout<<"column name: "<<col.name<<endl;
+        //cout<<"column name: "<<col.name<<endl;
         sql->add_column(col);
         goto loop;
       }
@@ -181,9 +176,9 @@ sql_token lexer_select(char *buffer, sqlselect *sql){
 }
 
 int main(){
-  char buffer[] = "select username from users where user.email = 'setheang@gmail.com'";
+  char buffer[] = "select <users.username, users.name from users where users.email = 'setheang@gmail.com'";
   sqlselect sql;
   cout<<lexer_select(buffer, &sql)<<endl;
-  //char keyword[] = "null";
-  //cout<<sql_keyword(keyword, 4)<<endl;
+  cout<<sql.get_table()<<endl;
+  sql.print_columns();
 }

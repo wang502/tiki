@@ -16,3 +16,13 @@ void sqlselect::add_where(sqlcolumn column, sqlstring value){
 void sqlselect::set_table(string t){
   this->table = t;
 }
+string sqlselect::get_table(){
+  return this->table;
+}
+void sqlselect::print_columns(){
+  cout<<"columns: ";
+  for (int i=0; i<this->columns.size(); i++){
+    cout<<this->columns[i].name<<", ";
+  }
+  cout<<endl;
+}

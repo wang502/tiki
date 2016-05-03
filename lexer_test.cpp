@@ -87,6 +87,7 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
     if (is_space(c)){
       SKIP;
       c = PEEK;
+      // when there is no table name coming befor the dot '.'
       if (is_dot(c)) return TOK_ERROR;
       goto loop;
     }

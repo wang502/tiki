@@ -86,6 +86,8 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
     char c =PEEK;
     if (is_space(c)){
       SKIP;
+      c = PEEK;
+      if (is_dot(c)) return TOK_ERROR;
       goto loop;
     }
     if (is_alpha(c)){
@@ -139,7 +141,14 @@ int main(){
   sqlselect sql;
   sql_token t = lexer_select(buffer, &sql);
   assert(t==TOK_FROM);
-  std::cout << "Execution continues past the first assert\n";
+  std::cout << "Parsing return TOK_FROM\n";
   sql.print_table();
   sql.print_columns();
+  char buffer2[] = "select .username, users.name from users where users.email = 'setheang@gmail.com'";
+  sqlselect sql2;
+  sql_token t2 = lexer_select(buffer2, &sql2);
+  assert(t2 == TOK_ERROR);
+  std::cout << "Parsing return ERROR token\n";
+  sql2.print_table();
+  sql2.print_columns();
 }

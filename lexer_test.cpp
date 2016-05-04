@@ -128,9 +128,22 @@ sql_token lexer_select(char *buffer, sqlselect *sql){
   struct sqlstate sql_state(buffer, 0, i);
   sql_token t = lexer_select_next(&sql_state, sql);
   if (t != TOK_SELECT) return TOK_ERROR;
-  //return t;
+
+  // lexer the targeted columns
   t = lexer_select_columns(&sql_state, sql);
-  if (t != TOK_FROM || t == TOK_ERROR) return TOK_ERROR;
+  if (t != TOK_FROM || t == TOK_ERROR){
+    cout<<"Syntax error around the column names"<<endl;
+    return TOK_ERROR;}
+
+  // lexer the table name
+  t = lexer_select_next(&sql_state, sql);
+  char name[10];
+  extract(&sql_state, name);
+  string table_name(name);
+  if (sql->get_table() != table_name){
+    cout<<"Table name not matching."<<endl;
+    return TOK_ERROR;
+  }
 
   /* lexer form clause */
 
@@ -138,18 +151,29 @@ sql_token lexer_select(char *buffer, sqlselect *sql){
 }
 
 int main(){
-  char buffer[] = "select users.username, users.name from users where users.email = 'setheang@gmail.com'";
+
+  // Wrong SQL where the table name not matching
+  char buffer[] = "select users.username, users.name from use where users.email = 'setheang@gmail.com'";
   sqlselect sql;
   sql_token t = lexer_select(buffer, &sql);
-  assert(t==TOK_FROM);
-  std::cout << "Parsing return TOK_FROM\n";
-  sql.print_table();
-  sql.print_columns();
+  assert(t==TOK_ERROR);
+  cout<<buffer<<endl;
+  std::cout << "Parsing return TOK_ERROR\n"<<endl;
+
+  // Wrong SQL command where an additional dot "." coming before the column names
   char buffer2[] = "select .username, users.name from users where users.email = 'setheang@gmail.com'";
   sqlselect sql2;
   sql_token t2 = lexer_select(buffer2, &sql2);
   assert(t2 == TOK_ERROR);
-  std::cout << "Parsing return ERROR token\n";
-  sql2.print_table();
-  sql2.print_columns();
+  cout<<buffer2<<endl;
+  std::cout << "Parsing return ERROR token\n"<<endl;
+
+  char buffer3[] = "select users.username, users.name from users where users.email = 'sethwang199418@gmail.com'";
+  sqlselect sql3;
+  sql_token t3 = lexer_select(buffer3, &sql3);
+  assert(t3 == TOK_IDENTIFIER);
+  cout<<buffer3<<endl;
+  std::cout << "Parsing return IDENTIFIER token\n"<<endl;
+  sql3.print_table();
+  sql3.print_columns();
 }

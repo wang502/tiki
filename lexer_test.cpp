@@ -47,6 +47,11 @@ sql_token lexer_alpha(sqlstate *sql_state, sqlselect *sql){
   return TOK_IDENTIFIER;
 }
 
+// lexer numerical string for select statement
+//sql_token lexer_num(sqlstate *sql_state, sqlselect *sql){
+
+//}
+
 void lexer_next(sqlstate *sql_state){
   char c = PEEK;
   //cout<<"peek: "<<c<<endl;
@@ -73,11 +78,13 @@ loop:
   if (is_alpha(c)){
     return lexer_alpha(sql_state, sql);
   }
+  /* checking if is digit */
+  if (is_digit(c)){
+
+  }
   if (is_all(c)){SKIP; goto loop;}
   if (is_quote(c)){SKIP; goto loop;}
   if (is_terminator(c)){return TOK_TERMINATOR;}
-
-  /* checking if is digit */
 
   return TOK_ERROR;
 }

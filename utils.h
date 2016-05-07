@@ -16,6 +16,10 @@ void extract(sqlstate *state, char *copy){
   *(copy+i) = '\0';
 }
 
+bool is_digit(char c){
+  return isdigit(c);
+}
+
 bool is_identifier(char c){
   return isalpha(c) || isdigit(c) || c == '_';
 }
@@ -35,13 +39,20 @@ bool is_dot(char c){
   return c == '.';
 }
 
+bool is_terminator(char c){
+  return c == ';';
+}
+
 bool is_puntuation(char c){
-  return c == ',' || c == ';' || c == '(' || c == ')';
+  return c == ',' || c == '(' || c == ')';
 }
 
 bool is_equal(char c){
   return c == '=';
 }
 
+bool is_quote(char c){
+  return c == '\'';
+}
 
 #endif

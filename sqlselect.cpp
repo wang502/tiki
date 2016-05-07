@@ -9,7 +9,7 @@ void sqlselect::add_column(sqlcolumn target){
   this->columns.push_back(target);
 }
 
-void sqlselect::add_where(sqlcolumn column, sqlstring value){
+void sqlselect::add_where(sqlcolumn column, string value){
   sqlwhere where(column, value);
   this->wheres.push_back(where);
 }
@@ -29,4 +29,10 @@ void sqlselect::print_columns(){
 
 void sqlselect::print_table(){
   cout<<"table: "<<this->table<<endl;
+}
+
+void sqlselect::print_wheres(){
+  for (int i=0; i<this->wheres.size();i++){
+    cout<<this->wheres[i].column.name<<"="<<this->wheres[i].value<<endl;
+  }
 }

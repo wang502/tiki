@@ -24,7 +24,7 @@ public:
 
   void add_column(sqlcolumn target);
 
-  void add_where(sqlcolumn column, sqlstring value);
+  void add_where(sqlcolumn column, string value);
 
   void set_table(string t);
 
@@ -33,6 +33,8 @@ public:
   void print_columns();
 
   void print_table();
+
+  void print_wheres();
 
 };
 #endif

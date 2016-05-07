@@ -6,6 +6,7 @@ typedef enum{
   /* 1 */TOK_DELETE,
   /* 2 */TOK_ORDER,
   /* 3 */TOK_BY,
+  /* 4 */TOK_AND,
   /* 4 */TOK_FROM,
   /* 5 */TOK_SELECT,
   /* 6 */TOK_HAVING,
@@ -18,7 +19,8 @@ typedef enum{
   /* 13 */ TOK_MERGE,
   /* 14 */TOK_IDENTIFIER,
   /* 15 */TOK_ERROR,
-  /* 16 */TOK_PASS
+  /* 16 */TOK_PASS,
+  /* 17 */TOK_TERMINATOR
 } sql_token;
 
 
@@ -28,6 +30,10 @@ sql_token sql_keyword(char *str, int length){
     case 2:
       if (!strcasecmp(str, "by"))
         return TOK_BY;
+      break;
+    case 3:
+      if (!strcasecmp(str, "and"))
+        return TOK_AND;
       break;
     case 4:
       if (!strcasecmp(str, "null"))

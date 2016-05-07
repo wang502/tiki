@@ -31,8 +31,8 @@ struct sqlcolumn{
 
 struct sqlwhere{
   sqlcolumn column;
-  sqlstring value;
-  sqlwhere(sqlcolumn newcolumn, sqlstring newvalue):column(newcolumn), value(newvalue){};
+  string value;
+  sqlwhere(sqlcolumn newcolumn, string newvalue):column(newcolumn), value(newvalue){};
 };
 
 struct sqltable{

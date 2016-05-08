@@ -75,7 +75,7 @@ loop:
     goto loop;
    }
    /* to be changed */
-  if (is_alpha(c)){
+  if (is_identifier(c)){
     return lexer_alpha(sql_state, sql);
   }
   /* checking if is digit */
@@ -103,7 +103,7 @@ sql_token lexer_select_columns(sqlstate *sql_state, sqlselect *sql){
       if (is_dot(c)) return TOK_ERROR;
       goto loop;
     }
-    if (is_alpha(c)){
+    if (is_identifier(c)){
       sql_token t = lexer_alpha(sql_state, sql);
       /* put the target column name into sql */
       if (t == TOK_FROM) return t;
@@ -282,7 +282,7 @@ int main(){
   cout<<endl;
   /* ---------------------------------------------------------------------------- */
   /* Test of lexer with more than 1 where clause */
-  char buffer6[] = "select users.username, users.name from users where users.username = 'sethwang' and users.first_name='xiaohui';";
+  char buffer6[] = "select users.username, users.name from users where users.username = 'sethwang' and users.age=21;";
   sqlselect sql6;
   sql_token t6 = lexer_select(buffer6, &sql6);
   assert(t6 == TOK_TERMINATOR);

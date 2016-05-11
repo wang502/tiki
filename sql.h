@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include <vector>
+#include "keyword.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ struct sqlstring {
 
 struct sqlcolumn{
   string name;
+  sql_type type;
   sqlcolumn(string newname): name(newname){}; //is_primary(is){};
 };
 

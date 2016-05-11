@@ -34,7 +34,38 @@ typedef enum{
   /* 7 */ TYPE_NONE,
 } sql_type;
 
-sql_token sql_keyword(char *str, int length){
+
+inline sql_type sql_checktype(char *s, int l){
+  switch(l){
+    case 3:
+      if (strcasecmp(s, "int"))
+        return TYPE_INT;
+      break;
+    case 4:
+      if (strcasecmp(s, "char"))
+        return TYPE_CHAR;
+      break;
+    case 5:
+      if (strcasecmp(s, "money"))
+        return TYPE_MONEY;
+      break;
+    case 6:
+      if (strcasecmp(s, "binary"))
+        return TYPE_BINARY;
+      break;
+    case 7:
+      if (strcasecmp(s, "boolean"))
+        return TYPE_BOOLEAN;
+      if (strcasecmp(s, "numeric"))
+        return TYPE_NUMERIC;
+      if (strcasecmp(s, "varchar"))
+        return TYPE_VARCHAR;
+      break;
+  }
+  return TYPE_NONE;
+}
+
+inline sql_token sql_keyword(char *str, int length){
   switch (length) {
     case 2:
       if (!strcasecmp(str, "by"))
@@ -77,35 +108,4 @@ sql_token sql_keyword(char *str, int length){
   }
   return TOK_IDENTIFIER;
 }
-
-sql_type sql_checktype(char *s, int l){
-  switch(l){
-    case 3:
-      if (strcasecmp(s, "int"))
-        return TYPE_INT;
-      break;
-    case 4:
-      if (strcasecmp(s, "char"))
-        return TYPE_CHAR;
-      break;
-    case 5:
-      if (strcasecmp(s, "money"))
-        return TYPE_MONEY;
-      break;
-    case 6:
-      if (strcasecmp(s, "binary"))
-        return TYPE_BINARY;
-      break;
-    case 7:
-      if (strcasecmp(s, "boolean"))
-        return TYPE_BOOLEAN;
-      if (strcasecmp(s, "numeric"))
-        return TYPE_NUMERIC;
-      if (strcasecmp(s, "varchar"))
-        return TYPE_VARCHAR;
-      break;
-  }
-  return TYPE_NONE;
-}
-
 #endif

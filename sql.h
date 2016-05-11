@@ -25,7 +25,6 @@ struct sqlstring {
 
 struct sqlcolumn{
   string name;
-  //bool is_primary;
   sqlcolumn(string newname): name(newname){}; //is_primary(is){};
 };
 

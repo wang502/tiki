@@ -15,9 +15,11 @@ class sqlselect{
 
   string table;
 
-  bool to_sort;
+  bool order;
 
   bool to_limit;
+
+  string order_by;
 
 public:
   sqlselect();
@@ -28,6 +30,8 @@ public:
 
   void set_table(string t);
 
+  void set_order_by(string o);
+
   string get_table();
 
   void print_columns();
@@ -35,6 +39,8 @@ public:
   void print_table();
 
   void print_wheres();
+
+  void print_order_by();
 
 };
 

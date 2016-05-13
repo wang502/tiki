@@ -149,6 +149,7 @@ sql_token lexer_select_where(sqlstate *sql_state, sqlselect *sql){
     if (is_alpha(c)){
       sql_token t = lexer_alpha(sql_state, sql);
       if (t == TOK_AND) {goto loop;}
+      if (t == TOK_ORDER) {return t;}
       c = PEEK;
       if (is_dot(c)){
         SKIP;
@@ -156,7 +157,7 @@ sql_token lexer_select_where(sqlstate *sql_state, sqlselect *sql){
         extract(sql_state, name);
         string table_name(name);
 
-        cout<<"table name:"<<table_name<<endl;
+        //cout<<"table name:"<<table_name<<endl;
 
         if (table_name != sql->get_table()) return TOK_ERROR;
         goto loop;
@@ -166,7 +167,7 @@ sql_token lexer_select_where(sqlstate *sql_state, sqlselect *sql){
         extract(sql_state, name);
         string column_name(name);
 
-        cout<<"column name: "<<column_name<<endl;
+        // cout<<"column name: "<<column_name<<endl;
 
         sqlcolumn col(column_name);
         // where username = ''
@@ -178,7 +179,7 @@ sql_token lexer_select_where(sqlstate *sql_state, sqlselect *sql){
         extract(sql_state, name);
         string value(name);
 
-        cout<<"value name: "<<value<<endl;
+        // cout<<"value name: "<<value<<endl;
 
         sql->add_where(col, value);
         goto loop;
@@ -216,10 +217,22 @@ sql_token lexer_select(char *buffer, sqlselect *sql){
   t = lexer_select_next(&sql_state, sql);
   if (t == TOK_TERMINATOR) return t;
   if (t != TOK_WHERE) return TOK_ERROR;
-  /* lexer the where clauses */
 
+  /* lexer the where clauses */
   t = lexer_select_where(&sql_state, sql);
-  if (t != TOK_TERMINATOR) return TOK_ERROR;
+  if (t == TOK_TERMINATOR) return t;
+
+  /* detect the ORDER keyword */
+  if (t == TOK_ORDER) t = lexer_select_next(&sql_state, sql);
+  if (t != TOK_BY) return TOK_ERROR;
+
+  /* lexer the order by clause */
+  t = lexer_select_next(&sql_state, sql);
+  char order_by_name[10];
+  extract(&sql_state, order_by_name);
+  sql->set_order_by(order_by_name);
+  t = lexer_select_next(&sql_state, sql);
+
   return t;
 }
 
@@ -292,5 +305,19 @@ int main(){
   sql6.print_columns();
   sql6.print_wheres();
 
+  cout<<endl;
+
+  /* ---------------------------------------------------------------------------- */
+  /* Test of lexer with ORDER BY clause following the where clause */
+  char buffer7[] = "select users.username, users.name from users where users.username = 'sethwang' and users.age=21 order by age;";
+  sqlselect sql7;
+  sql_token t7 = lexer_select(buffer7, &sql7);
+  assert(t7 == TOK_TERMINATOR);
+  cout<<buffer7<<endl;
+  cout<<"Parsing return TERMINATOR token"<<endl;
+  sql7.print_table();
+  sql7.print_columns();
+  sql7.print_wheres();
+  sql7.print_order_by();
   cout<<endl;
 }
